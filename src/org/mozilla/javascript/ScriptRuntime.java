@@ -1091,6 +1091,9 @@ public class ScriptRuntime {
         }
         if (value instanceof Scriptable) {
             Scriptable obj = (Scriptable) value;
+            if (obj instanceof TransparentProxy) {
+                obj = ((TransparentProxy) obj).getProxiedScriptable();
+            }
             // Wrapped Java objects won't have "toSource" and will report
             // errors for get()s of nonexistent name, so use has() first
             if (ScriptableObject.hasProperty(obj, "toSource")) {
@@ -1171,6 +1174,9 @@ public class ScriptRuntime {
 
     public static Scriptable toObject(Scriptable scope, Object val) {
         if (val instanceof Scriptable) {
+            if (val instanceof TransparentProxy) {
+                return ((TransparentProxy) val).getProxiedScriptable();
+            }
             return (Scriptable) val;
         }
         return toObject(Context.getContext(), scope, val);
@@ -1185,6 +1191,9 @@ public class ScriptRuntime {
     @Deprecated
     public static Scriptable toObjectOrNull(Context cx, Object obj) {
         if (obj instanceof Scriptable) {
+            if (obj instanceof TransparentProxy) {
+                return ((TransparentProxy) obj).getProxiedScriptable();
+            }
             return (Scriptable) obj;
         } else if (obj != null && !Undefined.isUndefined(obj)) {
             return toObject(cx, getTopCallScope(cx), obj);
@@ -1195,6 +1204,9 @@ public class ScriptRuntime {
     /** @param scope the scope that should be used to resolve primitive prototype */
     public static Scriptable toObjectOrNull(Context cx, Object obj, Scriptable scope) {
         if (obj instanceof Scriptable) {
+            if (obj instanceof TransparentProxy) {
+                return ((TransparentProxy) obj).getProxiedScriptable();
+            }
             return (Scriptable) obj;
         } else if (obj != null && !Undefined.isUndefined(obj)) {
             return toObject(cx, scope, obj);
@@ -1206,6 +1218,9 @@ public class ScriptRuntime {
     @Deprecated
     public static Scriptable toObject(Scriptable scope, Object val, Class<?> staticClass) {
         if (val instanceof Scriptable) {
+            if (val instanceof TransparentProxy) {
+                return ((TransparentProxy) val).getProxiedScriptable();
+            }
             return (Scriptable) val;
         }
         return toObject(Context.getContext(), scope, val);
@@ -1230,6 +1245,9 @@ public class ScriptRuntime {
             return result;
         }
         if (val instanceof Scriptable) {
+            if (val instanceof TransparentProxy) {
+                return ((TransparentProxy) val).getProxiedScriptable();
+            }
             return (Scriptable) val;
         }
         if (val instanceof CharSequence) {
@@ -4846,6 +4864,9 @@ public class ScriptRuntime {
     private static void storeScriptable(Context cx, Scriptable value) {
         // The previously stored scratchScriptable should be consumed
         if (cx.scratchScriptable != null) throw new IllegalStateException();
+        if (value instanceof TransparentProxy) {
+            value = ((TransparentProxy) value).getProxiedScriptable();
+        }
         cx.scratchScriptable = value;
     }
 

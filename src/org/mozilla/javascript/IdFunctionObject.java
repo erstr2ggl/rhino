@@ -81,6 +81,11 @@ public class IdFunctionObject extends BaseFunction {
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        for (int i = 0; i < args.length; ++i) {
+            if (args[i] instanceof TransparentProxy) {
+                args[i] = ((TransparentProxy) args[i]).getProxiedScriptable();
+            }
+        }
         return idcall.execIdCall(this, cx, scope, thisObj, args);
     }
 
